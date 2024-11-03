@@ -10,14 +10,16 @@ public class Clicker : MonoBehaviour
     public float scale = 1.2f;
     public float duration = 0.1f;
     public Ease ease;
-    public new AudioSource audio;
+    [Header("Sound")]
+    private AudioSource audio;
+    public AudioClip clip;
 
-    private int clicks = 0;
+    [HideInInspector]public int clicks = 0;
     public TextMeshProUGUI clickCount;
 
     void Start()
     {
-        
+        audio = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -30,6 +32,8 @@ public class Clicker : MonoBehaviour
         clicks++;
         UIManager.instance.UpdateClicks(clicks);
         transform.DOScale(1, duration).ChangeStartValue(scale * Vector3.one).SetEase(ease);
+        audio.pitch = Random.Range(2.8f, 3);
+        audio.PlayOneShot(clip);
 
 
     }
