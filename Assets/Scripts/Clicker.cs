@@ -20,6 +20,11 @@ public class Clicker : MonoBehaviour
     public TextMeshProUGUI cps;
     private int click = 0;
 
+    [Header("Settings")]
+    public int clickValue = 1;
+    public List<GameObject> updates;
+    [HideInInspector] public int updateIdex = 0; 
+
     [HideInInspector]public int clicks = 0;
     public TextMeshProUGUI clickCount;
 
@@ -27,27 +32,56 @@ public class Clicker : MonoBehaviour
     {
         audio = GetComponent<AudioSource>();
         InvokeRepeating("Click", 0, 1);
-        PlayerPrefs.GetInt("clicks", 0);
+        clicks = PlayerPrefs.GetInt("clicks", 0);
+        clickValue = PlayerPrefs.GetInt("clickValue", 1);
+        updateIdex = PlayerPrefs.GetInt("updateIdex", 0);
+        UpdateCookie();
+
     }
 
     private void OnMouseDown()
     {
         clickParticles.Emit(1);
 
-        clicks++;
+        clicks += clickValue;
         UIManager.instance.UpdateClicks(clicks);
         
         transform.DOScale(1, duration).ChangeStartValue(scale * Vector3.one).SetEase(ease);
         audio.pitch = Random.Range(2.8f, 3);
         audio.PlayOneShot(clip);
         click++;
-        PlayerPrefs.SetInt("clicks", +1);
-        PlayerPrefs.Save();
+        
 
+    }
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+        {
+            Save();
+        }
+    }
+    private void OnApplicationQuit()
+    {
+        Save();
+    }
+    public void Save()
+    {
+        PlayerPrefs.SetInt("clicks", clicks);
+        PlayerPrefs.SetInt("clickValue", clickValue);
+        PlayerPrefs.SetInt("updateIdex", updateIdex);
+        PlayerPrefs.Save();
     }
     private void Click()
     {
         cps.text = $"cps: {click}";
         click = 0;
+    }
+
+    public void UpdateCookie()
+    {
+        clickValue++;
+        updates[updateIdex].SetActive(false);
+        updateIdex++;
+        updates[updateIdex].SetActive(true);
     }
 }
